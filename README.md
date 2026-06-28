@@ -5,7 +5,7 @@ Public static site for Ezra-generated artifacts, intended for GitHub Pages.
 ## What this repo contains
 
 - A minimal landing page at `index.html`
-- A custom `404.html` so broken links fail gracefully
+- A custom `404.html` so broken links fail gracefully on the project Pages path
 - A GitHub Actions workflow that deploys the site to GitHub Pages
 
 ## Publishing model
@@ -23,4 +23,4 @@ After the empty GitHub repository exists, run:
 /home/openclaw/.openclaw/workspace/bin/ezra-public-push
 ```
 
-That script initializes the repo if needed, sets the `origin`, commits the scaffold, renames the branch to `main`, and pushes to GitHub.
+That script syncs the Windows source directory into the Linux working repo, initializes the repo if needed, sets the `origin`, commits changes, renames the branch to `main`, and pushes to GitHub.
