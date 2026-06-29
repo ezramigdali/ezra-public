@@ -178,6 +178,83 @@
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
+
+    .app.is-locked {
+      min-height: 100vh;
+      filter: blur(3px);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .unlock {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      background: rgba(14, 18, 47, 0.72);
+      backdrop-filter: blur(12px);
+    }
+
+    .unlock[hidden] {
+      display: none;
+    }
+
+    .unlock-box {
+      width: min(420px, 100%);
+      border-radius: 8px;
+      padding: 24px;
+      background: var(--paper);
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 14px;
+      text-align: right;
+    }
+
+    .unlock-moon {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #fff3bd;
+      box-shadow: inset -10px 5px 0 rgba(255, 207, 74, 0.55);
+      font-size: 26px;
+    }
+
+    .unlock-box h2,
+    .unlock-box p {
+      margin: 0;
+    }
+
+    .unlock-box p {
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .unlock-box label {
+      display: grid;
+      gap: 7px;
+      font-weight: 800;
+    }
+
+    .unlock-box input {
+      width: 100%;
+      min-height: 46px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      padding: 0 12px;
+      background: #fff;
+    }
+
+    .unlock-error {
+      min-height: 22px;
+      color: #a12b35;
+      font-weight: 800;
+    }
+
     .stage {
       padding: 28px;
       display: grid;
@@ -555,7 +632,22 @@
   </style>
 </head>
 <body>
-  <main class="app">
+
+  <section class="unlock" id="unlockScreen" aria-label="פתיחת הספר">
+    <form class="unlock-box" id="unlockForm">
+      <div class="unlock-moon" aria-hidden="true">☾</div>
+      <h2>הספר נעול</h2>
+      <p>הכניסו סיסמה כדי לפתוח את גרסת הספר הפרטית.</p>
+      <label>
+        סיסמה
+        <input id="bookPassword" type="password" autocomplete="current-password" inputmode="text" dir="ltr" required>
+      </label>
+      <button class="primary" type="submit">פתיחת הספר</button>
+      <div class="unlock-error" id="unlockError" role="status" aria-live="polite"></div>
+    </form>
+  </section>
+
+  <main class="app is-locked" id="appShell" aria-hidden="true">
     <aside class="side">
       <section class="brand" aria-label="שם המשחק">
         <h1>קסם זמן ירח</h1>
@@ -643,6 +735,15 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
+    const encryptedBook = {
+          "version": 1,
+          "kdf": "PBKDF2-SHA256",
+          "iterations": 310000,
+          "salt": "4x7nSe7VXg3hYAML1emaYw==",
+          "iv": "cy4ah5KW9xjLo6oz",
+          "ciphertext": "30tjRNpnl7PuPijICfjqwl8iIp9Aju4LYxLDD521iwN4mQspsvy0GQlI2IcZ7goHOT2Q1YT4P1n0EJWESIhQfkjsY8vBDKGEqsA82rKpu+Ns3BMTOpqO4T7E/8x/gLQYvMwgih55Gs5pi6gAisrKf4LSGcUBNOYXN/DbLd/Qs4/8efG2i/2K8n5ywkQzSd3Cixga+yE4vTBnMQT5OTz1w6hY5bP9BCfaBXMNNSB73O0cYEZHnhXsGcw0u1r/kV9MfBs/+TCmZkZju3atoYVYd5+dQxdliW/RukZsDEUm3H5FiYj9tn4EpbykhLRnkZ2FoXj1cuqmwUEhRftvl9rgPViEx2uB1zZ/8JpVQl3v3XyGJcJUgcbg7J11fGt3l+dn/OtljItoDjGAlQqPS3xoIXFAPW7qM4Unh/dzfm1Q+UbATqXgl5C5Dgm9sL7hwa5xILiP2hmz3GMk2cINCzj2toSWuLhxqZAfoW7zm3U58Zm1u6iX8PpzmEi9mVVs3j8zI1mVkhx2zh2tXBlvYiaYNW/i/1ZCAO39c8pmlgwFCeO97l3bXDwPQhF9Bj7Agn+QzrqA2ZESainvahMpF9n98ushunvLxU6a42G2OfpdkFwRieVLVaXdVuNuihr65VRrShGK/QlCa8JDd2BVaJ+jvVxE3wp+kdIANc0tSgSgthKWKJIRqtowNriYC0vNm0NZUJ7pQFLrcxrBNO9ydIoXGWc8ELy3aAc8xvM2abbEvjrFbcgRPGuY0emjsfAwAFP/1MytJtr0yEvRE6bCw0bsxDAjvMaVhySZ3IEPEd3HqliNIIgvwvTY08/8+UwHAg5XC0qEXZ83taw4kLtgCDlkA7Q5uKnrqSd+3oDKISlpQkwlRsgvSwVKSI1wf82oOXKAvqU6P3/eWRFrVwpGkmLUYZAYoRvAkPprAOfusCPi5bxxLGrg7pYLe+laDI/YxdhMo4TJ4di8qVLxkDqbePxUT+5i6o+PVRHY+zkMGNgJc8oA2DWP2CrQDp4fvTd0tq2SgaSqbLDUsZh5P/ZHVIEZlXgZOY5O8atxEkoGII4f5jG9tMH4H99hWjw="
+    };
+
     const demoPages = [
       { title: "שער הירח הראשון", text: "רוני קוראת מילה ועוד מילה" },
       { title: "כוכב קטן", text: "הכוכב מאיר מעל הבית" },
@@ -652,7 +753,7 @@
       { title: "סיום קסום", text: "קראתי הכל ואני גאה בעצמי" }
     ];
 
-    const storageKey = "roniMoonReader.public.v1";
+    const storageKey = "roniMoonReader.locked.progress.v1";
     const state = {
       pages: [],
       current: 0,
@@ -678,6 +779,11 @@
       highlightToggle: document.getElementById("highlightToggle"),
       editPages: document.getElementById("editPages"),
       resetProgress: document.getElementById("resetProgress"),
+      appShell: document.getElementById("appShell"),
+      unlockScreen: document.getElementById("unlockScreen"),
+      unlockForm: document.getElementById("unlockForm"),
+      bookPassword: document.getElementById("bookPassword"),
+      unlockError: document.getElementById("unlockError"),
       editor: document.getElementById("editor"),
       closeEditor: document.getElementById("closeEditor"),
       savePages: document.getElementById("savePages"),
@@ -706,28 +812,77 @@
       return pages.map(page => `${page.title}\n${page.text}`).join("\n\n");
     }
 
-    function load() {
+    function loadProgress() {
       const saved = localStorage.getItem(storageKey);
-      if (!saved) {
-        state.pages = demoPages;
-        return;
-      }
+      if (!saved) return;
       try {
         const parsed = JSON.parse(saved);
-        state.pages = Array.isArray(parsed.pages) && parsed.pages.length ? parsed.pages : demoPages;
         state.current = Math.min(parsed.current || 0, state.pages.length - 1);
         state.done = new Set(Array.isArray(parsed.done) ? parsed.done : []);
       } catch {
-        state.pages = demoPages;
+        state.current = 0;
+        state.done = new Set();
       }
     }
 
     function save() {
       localStorage.setItem(storageKey, JSON.stringify({
-        pages: state.pages,
         current: state.current,
         done: Array.from(state.done)
       }));
+    }
+
+    function fromBase64(value) {
+      const binary = atob(value);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+      return bytes;
+    }
+
+    async function decryptBook(password) {
+      const encoder = new TextEncoder();
+      const passwordKey = await crypto.subtle.importKey(
+        "raw",
+        encoder.encode(password),
+        "PBKDF2",
+        false,
+        ["deriveKey"]
+      );
+      const key = await crypto.subtle.deriveKey(
+        {
+          name: "PBKDF2",
+          salt: fromBase64(encryptedBook.salt),
+          iterations: encryptedBook.iterations,
+          hash: "SHA-256"
+        },
+        passwordKey,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["decrypt"]
+      );
+      const decrypted = await crypto.subtle.decrypt(
+        { name: "AES-GCM", iv: fromBase64(encryptedBook.iv) },
+        key,
+        fromBase64(encryptedBook.ciphertext)
+      );
+      const parsed = JSON.parse(new TextDecoder().decode(decrypted));
+      if (!Array.isArray(parsed.pages) || !parsed.pages.length) throw new Error("Missing pages");
+      return parsed.pages;
+    }
+
+    async function unlock(password) {
+      els.unlockError.textContent = "פותח...";
+      const pages = await decryptBook(password);
+      state.pages = pages;
+      state.current = 0;
+      state.word = 0;
+      state.done = new Set();
+      loadProgress();
+      els.unlockScreen.hidden = true;
+      els.appShell.classList.remove("is-locked");
+      els.appShell.removeAttribute("aria-hidden");
+      els.bookPassword.value = "";
+      render();
     }
 
     function wordsFor(page) {
@@ -898,8 +1053,22 @@
       }
     });
 
-    load();
-    render();
+    els.unlockForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      try {
+        await unlock(els.bookPassword.value);
+      } catch {
+        els.unlockError.textContent = "הסיסמה לא נכונה";
+        els.bookPassword.select();
+      }
+    });
+
+    if (!window.crypto || !window.crypto.subtle) {
+      els.unlockError.textContent = "צריך דפדפן מודרני כדי לפתוח את הספר";
+      els.bookPassword.disabled = true;
+    } else {
+      els.bookPassword.focus();
+    }
   </script>
 </body>
 </html>
