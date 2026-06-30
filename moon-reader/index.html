@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>שביל הירח של רוני</title>
+  <title>שביל הירח</title>
   <style>
     :root {
       --ink: #221836;
@@ -110,6 +110,34 @@
       padding: 24px;
     }
 
+    .sky-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      opacity: 0.78;
+      pointer-events: none;
+    }
+
+    .sky-svg .drift {
+      animation: drift 7200ms ease-in-out infinite;
+      transform-origin: center;
+    }
+
+    .sky-svg .twinkle {
+      animation: twinkle 2100ms ease-in-out infinite;
+      transform-origin: center;
+    }
+
+    .sky-svg .twinkle:nth-child(2n) {
+      animation-delay: 520ms;
+    }
+
+    .sky-svg .twinkle:nth-child(3n) {
+      animation-delay: 980ms;
+    }
+
     .brand {
       max-width: 450px;
     }
@@ -137,6 +165,21 @@
       border-radius: var(--radius);
     }
 
+    .quest-map::before {
+      content: "";
+      position: absolute;
+      right: 31%;
+      bottom: 13%;
+      width: 46%;
+      height: 74%;
+      border: 2px dashed rgba(255, 248, 200, 0.52);
+      border-left-color: transparent;
+      border-top-color: rgba(255, 248, 200, 0.28);
+      border-radius: 50%;
+      transform: rotate(-24deg);
+      filter: drop-shadow(0 0 16px rgba(255, 200, 69, 0.28));
+    }
+
     .map-stop {
       position: absolute;
       width: 58px;
@@ -157,9 +200,33 @@
       box-shadow: 0 0 0 8px rgba(66, 184, 131, 0.2), 0 12px 28px rgba(0, 0, 0, 0.3);
     }
 
+    .map-stop.done::after,
+    .map-stop.current::after {
+      content: "";
+      position: absolute;
+      inset: -14px;
+      border: 2px solid rgba(255, 248, 200, 0.5);
+      border-radius: 50%;
+      opacity: 0;
+      transform: scale(0.7);
+      pointer-events: none;
+    }
+
+    .map-stop.done::after {
+      animation: gate-glimmer 3200ms ease-in-out infinite;
+    }
+
     .map-stop.current {
       background: #fff7c8;
       animation: pulse 1500ms ease-in-out infinite;
+    }
+
+    .map-stop.just-opened {
+      animation: pop-open 700ms ease-out, gate-glow 1300ms ease-out;
+    }
+
+    .map-stop.just-opened::after {
+      animation: gate-ring 900ms ease-out;
     }
 
     .map-stop.locked {
@@ -322,6 +389,15 @@
         url("assets/moon-map-v2.png") center / cover no-repeat;
     }
 
+    .hero-art svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
     .hero-art::after {
       content: "";
       position: absolute;
@@ -391,13 +467,55 @@
       align-items: center;
     }
 
+    .luna-portrait {
+      position: relative;
+      width: 112px;
+      height: 112px;
+      display: grid;
+      place-items: center;
+    }
+
+    .luna-portrait::before {
+      content: "";
+      position: absolute;
+      inset: -8px;
+      border: 2px solid rgba(255, 200, 69, 0.45);
+      border-top-color: rgba(15, 166, 160, 0.58);
+      border-radius: 50%;
+      animation: luna-orbit 5600ms linear infinite;
+    }
+
+    .luna-portrait::after {
+      content: "✦";
+      position: absolute;
+      left: 7px;
+      top: 2px;
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #fff7c8;
+      color: #6d4d00;
+      box-shadow: 0 0 0 6px rgba(255, 200, 69, 0.18), 0 8px 18px rgba(39, 29, 78, 0.18);
+      animation: luna-spark 2400ms ease-in-out infinite;
+    }
+
     .companion img {
       width: 104px;
       aspect-ratio: 1;
-      object-fit: cover;
+      object-fit: contain;
       border-radius: 50%;
       border: 4px solid #fff;
       box-shadow: 0 12px 28px rgba(39, 29, 78, 0.22);
+      background:
+        radial-gradient(circle at 50% 42%, rgba(255, 248, 213, 0.95), rgba(255, 253, 246, 0.55) 62%, transparent 72%);
+      transition: transform 240ms ease, box-shadow 240ms ease;
+    }
+
+    .companion img.celebrating {
+      transform: translateY(-5px) rotate(-2deg) scale(1.04);
+      box-shadow: 0 16px 34px rgba(207, 78, 88, 0.28);
     }
 
     .speech {
@@ -409,6 +527,28 @@
       line-height: 1.5;
       font-weight: 800;
     }
+
+    .luna-moods {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .luna-thumb {
+      min-height: 78px;
+      border: 1px solid rgba(34, 24, 54, 0.11);
+      border-radius: var(--radius);
+      background-color: #fffdf6;
+      background-size: 118% auto;
+      background-position: center 18%;
+      background-repeat: no-repeat;
+      box-shadow: 0 8px 18px rgba(39, 29, 78, 0.09);
+    }
+
+    .luna-thumb.welcome { background-image: url("assets/luna-welcome.png"); }
+    .luna-thumb.happy { background-image: url("assets/luna-happy.png"); }
+    .luna-thumb.curious { background-image: url("assets/luna-curious.png"); }
+    .luna-thumb.proud { background-image: url("assets/luna-proud.png"); }
 
     .meter-card {
       padding: 14px;
@@ -650,12 +790,26 @@
     }
 
     .card-art {
+      position: relative;
       display: grid;
       place-items: center;
       font-size: 54px;
       background:
         linear-gradient(135deg, rgba(15, 166, 160, 0.28), rgba(255, 200, 69, 0.34)),
         #f7fff9;
+    }
+
+    .card-art::after {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      border-radius: 50%;
+      transform: rotate(18deg);
+    }
+
+    .discovery-card:not(.locked) .card-art {
+      animation: card-glow 2800ms ease-in-out infinite;
     }
 
     .discovery-card.locked {
@@ -777,9 +931,84 @@
       animation: fly 950ms ease-out forwards;
     }
 
+    .spark.star {
+      width: 19px;
+      height: 19px;
+      border-radius: 0;
+      clip-path: polygon(50% 0, 62% 34%, 98% 35%, 69% 56%, 79% 91%, 50% 70%, 21% 91%, 31% 56%, 2% 35%, 38% 34%);
+    }
+
+    .spark.moonlet {
+      width: 22px;
+      height: 22px;
+      background: #fff2a8;
+      box-shadow: inset -7px 0 0 rgba(255, 200, 69, 0.55);
+    }
+
+    .moon-burst {
+      position: absolute;
+      width: 64px;
+      height: 64px;
+      color: #fff2a8;
+      filter: drop-shadow(0 10px 16px rgba(34, 24, 54, 0.22));
+      animation: moon-float 1200ms ease-out forwards;
+    }
+
     @keyframes pulse {
       0%, 100% { transform: translateY(0) scale(1); }
       50% { transform: translateY(-4px) scale(1.08); }
+    }
+
+    @keyframes drift {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      50% { transform: translate(-10px, 12px) rotate(3deg); }
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.38; transform: scale(0.72); }
+      50% { opacity: 1; transform: scale(1.12); }
+    }
+
+    @keyframes luna-orbit {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes luna-spark {
+      0%, 100% { transform: translate(0, 0) scale(0.9); opacity: 0.72; }
+      50% { transform: translate(-4px, 5px) scale(1.12); opacity: 1; }
+    }
+
+    @keyframes pop-open {
+      0% { transform: scale(0.78); }
+      58% { transform: scale(1.18); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes gate-glimmer {
+      0%, 68%, 100% { opacity: 0; transform: scale(0.78); }
+      78% { opacity: 0.95; transform: scale(1.04); }
+    }
+
+    @keyframes gate-glow {
+      0% { box-shadow: 0 0 0 0 rgba(255, 248, 200, 0.1), 0 12px 28px rgba(0, 0, 0, 0.32); }
+      45% { box-shadow: 0 0 0 18px rgba(255, 248, 200, 0.26), 0 0 34px rgba(255, 200, 69, 0.8); }
+      100% { box-shadow: 0 0 0 8px rgba(66, 184, 131, 0.2), 0 12px 28px rgba(0, 0, 0, 0.3); }
+    }
+
+    @keyframes gate-ring {
+      0% { opacity: 0.9; transform: scale(0.64); }
+      100% { opacity: 0; transform: scale(1.75); }
+    }
+
+    @keyframes card-glow {
+      0%, 100% { filter: saturate(1); }
+      50% { filter: saturate(1.25) brightness(1.04); }
+    }
+
+    @keyframes moon-float {
+      0% { opacity: 0; transform: translateY(40px) scale(0.62) rotate(-12deg); }
+      20% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(-150px) scale(1.14) rotate(16deg); }
     }
 
     @keyframes fly {
@@ -864,87 +1093,28 @@
       .stop-4 { right: 28%; bottom: 68%; }
       .stop-5 { right: 66%; bottom: 80%; }
     }
-
-    .unlock {
-      position: fixed;
-      inset: 0;
-      z-index: 50;
-      display: grid;
-      place-items: center;
-      padding: 18px;
-      background:
-        linear-gradient(0deg, rgba(16, 23, 53, 0.62), rgba(16, 23, 53, 0.28)),
-        url("assets/moon-map-v2.png") center / cover no-repeat;
-    }
-
-    .unlock[hidden] {
-      display: none;
-    }
-
-    .unlock-box {
-      width: min(430px, 100%);
-      padding: 22px;
-      border: 1px solid rgba(255, 255, 255, 0.28);
-      border-radius: var(--radius);
-      background: rgba(255, 253, 246, 0.94);
-      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
-      display: grid;
-      gap: 13px;
-      color: var(--ink);
-    }
-
-    .unlock-box h2 { margin: 0; font-size: 28px; }
-    .unlock-box p { margin: 0; color: var(--muted); line-height: 1.45; }
-
-    .unlock-moon {
-      width: 82px;
-      height: 82px;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-      background: radial-gradient(circle at 34% 30%, #fffad1, var(--gold));
-      box-shadow: inset -13px 6px 0 rgba(214, 142, 0, 0.18), 0 12px 26px rgba(195, 128, 0, 0.22);
-      font-size: 38px;
-    }
-
-    .unlock-box label { display: grid; gap: 7px; font-weight: 800; }
-
-    .unlock-box input {
-      min-height: 46px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 0 12px;
-      background: #fff;
-      color: var(--ink);
-      outline: none;
-    }
-
-    .unlock-error { min-height: 20px; color: var(--coral-dark); font-weight: 800; }
-    .shell.is-locked { display: none; }
-
   </style>
 </head>
 <body>
-  <section class="unlock" id="unlockScreen" aria-label="פתיחת הספר">
-    <form class="unlock-box" id="unlockForm">
-      <div class="unlock-moon" aria-hidden="true">☾</div>
-      <h2>שביל הירח נעול</h2>
-      <p>הכניסו סיסמה כדי לפתוח את גרסת הספר הפרטית.</p>
-      <label>
-        סיסמה
-        <input id="bookPassword" type="password" autocomplete="current-password" inputmode="text" dir="ltr" required>
-      </label>
-      <button class="btn primary" type="submit">פתיחת הספר</button>
-      <div class="unlock-error" id="unlockError" role="status" aria-live="polite"></div>
-    </form>
-  </section>
-
-  <main class="shell is-locked" id="appShell" aria-hidden="true">
+  <main class="shell">
     <section class="world" aria-label="מפת שביל הירח">
       <div class="world-content">
+        <svg class="sky-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <g class="drift" fill="none" stroke="rgba(255,248,200,0.46)" stroke-width="0.32">
+            <path d="M74 12 C66 24 69 36 82 43 C68 42 58 50 54 63 C52 48 43 41 30 39 C44 34 54 25 55 10" />
+          </g>
+          <g fill="rgba(255,248,200,0.92)">
+            <circle class="twinkle" cx="18" cy="17" r="0.9" />
+            <circle class="twinkle" cx="32" cy="8" r="0.62" />
+            <circle class="twinkle" cx="84" cy="26" r="0.75" />
+            <circle class="twinkle" cx="76" cy="72" r="0.7" />
+            <circle class="twinkle" cx="23" cy="77" r="0.58" />
+            <circle class="twinkle" cx="58" cy="87" r="0.82" />
+          </g>
+        </svg>
         <header class="brand">
-          <h1>שביל הירח של רוני</h1>
-          <p>מפת קריאה קסומה עם לומי המלווה, משימות קצרות, קלפי גילוי ותיבת פרסים שההורים שולטים בה.</p>
+          <h1>שביל הירח</h1>
+          <p>מפת קריאה קסומה עם לונה המלווה, משימות קצרות, קלפי גילוי ותיבת פרסים שההורים שולטים בה.</p>
         </header>
 
         <div class="quest-map" id="questMap" aria-label="תחנות במסע"></div>
@@ -956,7 +1126,7 @@
           </div>
           <div class="stat">
             <strong id="starStat">0</strong>
-            <span>ניצוצות ירח נאספו</span>
+            <span>קלפי גילוי נפתחו</span>
           </div>
           <div class="stat">
             <strong id="rewardStat">נעולה</strong>
@@ -984,10 +1154,19 @@
       <section class="view active" id="home">
         <div class="dashboard">
           <article class="hero-panel">
-            <div class="hero-art" aria-hidden="true"></div>
+            <div class="hero-art" aria-hidden="true">
+              <svg viewBox="0 0 500 260" preserveAspectRatio="none">
+                <path d="M54 214 C126 152 148 176 212 114 C284 46 362 72 446 30" fill="none" stroke="rgba(255,248,200,0.72)" stroke-width="4" stroke-linecap="round" stroke-dasharray="10 13" />
+                <g fill="rgba(255,200,69,0.9)">
+                  <circle class="twinkle" cx="92" cy="188" r="5" />
+                  <circle class="twinkle" cx="214" cy="112" r="4" />
+                  <circle class="twinkle" cx="342" cy="70" r="5" />
+                </g>
+              </svg>
+            </div>
             <div class="hero-copy">
               <h2 id="missionTitle">המשימה של היום: לפתוח שער ירח אחד</h2>
-              <p id="missionText">רוני קוראת קטע קצר, מסמנת שסיימה, ולומי פותחת תחנה חדשה במפה. אחרי כמה תחנות נפתחת תיבה שההורים יכולים למלא בפרס קטן.</p>
+              <p id="missionText">הקוראת קוראת קטע קצר, מסמנת שסיימה, ולונה פותחת תחנה חדשה במפה. מדי פעם נפתח קלף, מכתב או תיבה שההורים יכולים למלא בפרס קטן.</p>
               <div class="quest-row">
                 <div class="quest-card">
                   <b>1. בוחרים קטע</b>
@@ -1007,8 +1186,16 @@
 
           <aside class="companion-panel">
             <div class="companion">
-              <img src="assets/moon-companion-v2.png" alt="לומי, דמות ירח מלווה">
-              <div class="speech" id="companionSpeech">היי רוני, אני לומי. היום אנחנו צריכות רק שער אחד. קטן, נוצץ, ואפשרי.</div>
+              <div class="luna-portrait">
+                <img id="lunaImage" src="assets/luna-welcome.png" alt="לונה, דמות ירח מלווה">
+              </div>
+              <div class="speech" id="companionSpeech">היי לך, אני לונה. היום אנחנו צריכות רק שער אחד. קטן, נוצץ, ואפשרי.</div>
+            </div>
+            <div class="luna-moods" aria-label="מבטים של לונה">
+              <div class="luna-thumb welcome" title="לונה מקבלת אותך"></div>
+              <div class="luna-thumb happy" title="לונה שמחה כששער נפתח"></div>
+              <div class="luna-thumb curious" title="לונה מעודדת בזמן קריאה"></div>
+              <div class="luna-thumb proud" title="לונה גאה בסיום מסע"></div>
             </div>
             <div class="meter-card">
               <div class="meter-top">
@@ -1090,38 +1277,27 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
-    const encryptedBook = {
-      "version": 1,
-      "kdf": "PBKDF2-SHA256",
-      "iterations": 310000,
-      "salt": "pn57d5A0moB7S/KKdr/ABw==",
-      "iv": "A2NnEhY45VOrnyM9",
-      "ciphertext": "wxMpk+pmtxdp1rCY0JyFMgJBmV9zwhSEJTFkOD4vndBow++vmoNigu9AoFZLfYkIxzQiCBU+URVQ8UalZZIfMjri7tNLdqeMktVEezaQOHAkryrhmIGL2V54wPb7H7d+xJLCw6X3Y6NFKFJaJRTsZAl3ZoQI2Efw7Sdz3FwXJFdler1yFOh009ZxUgd/YEJnO/4RXL8WQyUBLTlajRsfcbvIAEYuOU4dSRWiISbuFQND9lXxq2UvEz0021RkuqanYsvPgduxGUdVzhnpctWHk1/j1ZjtVfd6D0AJjL8QscP+3RHNXwvIcwfJqjG2gkyyBzU7UJkghNA99oNGAqe+aGZDX2UG+U//cMKn42HWB45NrDWgdYGohspr2rn83qoWZC83lMrwPMejnMrheelpMyXR7MmC0N3CCM5KqCAN7tvv6EUYDSpvigY8bup+AHvPdH1CcHwTgdkZdMJC5O5+Tyskh7TTUMxtrjhLKBfSx+Cd+eGNMNXeyh79zqyNo24pCxE1kajEtWLNZVsU3NzO3si5woscBBl4vndBZlphkcX9X4ANVbOIFzxidUI/jIM+Pd2bqNVqnpfb68iZEZOODDM2DtCOKC85yJrTG8LwcBrixqUks0/YjncGmAb5D00CQaQqWWwc5ZowSdKytq6Uzcm+jioQ+aza7wSLmlW0DGgm7M5C4LIlcMuaf5a6IcdnAG741K1pSqeiAzQlx8t+BT0+e9Tl/hGpmd8nK0UtgVSRhvgLNA2CvDjch2bO5iQlpKzRjdXHCZaYtd5VgWurAxlS80v8P7LD15DDj4JggLD0v5CBiFSrEJRFXyL7MYu5UwGHZcMRre44bCbuoRGjRcMCFX8Evrioz6dx6ssvGDFsRfpdsGszaUCehTpMXtHGQGjWV2ikrk0ycUpxXC1qY3E8bY+D7TOI1G9zRIGnJL4NdK6fKjgPikU79v5zLwNFGMCVkxaQSsN2GvPnKFjmO/Kt2g9mMqkIH8Cw5x0QWxtP2nSToCkg30blCpBtqz8/dE59sWklpkCi7TaEi7VxF3s3oTT/ssWhW/UWDvQs6ux3YM913NSj0MHmkW4sSUPVWpfrP5sU3XrdH53/zphKdUTqvZVJ8dcOtV+wdeDUp4js+7SoJ1Phkadd2w3KdM++brsU4BjhvzvAtyLLqBOiD6VqGq06CIW4Qqi/eUWzAmMTX+Y3fMTjI7zTXQqFCQcTXn/HRr85ikYkbz+jcetQVRSqiA1ey4OiMGn/i5llFeguD05JztiVRbkxDVWNHaQ5lgQpMTkjAMAiRLLTvOtf7V4BratwIYKHMrP9pzK+eYDhun9sthmEzqP+ncqf"
-}
-    ;
-
     const demoPages = [
-      { title: "שער ראשון", text: "רוני מדליקה פנס ירח קטן וצועדת אל השביל הנוצץ." },
-      { title: "שער מילים", text: "כל מילה שהיא קוראת מוסיפה אור חדש לאבן שעל הדרך." },
-      { title: "שער אומץ", text: "גם כשמילה ארוכה מחכה באמצע העמוד, רוני מפרקת אותה לאט." },
-      { title: "שער לומי", text: "לומי מחייכת ואומרת: עוד משפט אחד, ואז נפתח סוד במפה." },
-      { title: "שער הגביש", text: "בקצה הגשר מחכה גביש קטן ששומר את המילה הכי יפה של היום." },
-      { title: "שער התיבה", text: "כשרוני מסיימת את המסע, תיבת הירח נפתחת באור זהוב." }
+      { title: "שער רגשות", text: "לִפְעָמִים אֲנִי צוֹחֵקֶת וְהַצְּחוֹק קוֹפֵץ כְּמוֹ כּוֹכָב קָטָן." },
+      { title: "שער עננים", text: "וְלִפְעָמִים אֲנִי שְׁקֵטָה, וְהַלֵּב שֶׁלִּי צָרִיךְ חִבּוּק רַךְ." },
+      { title: "שער אומץ", text: "לִפְעָמִים מִלָּה אֲרֻכָּה נִרְאֵית כְּמוֹ הַר, אֲבָל אֲנִי מְטַפֶּסֶת לְאַט." },
+      { title: "שער חיוך", text: "כְּשֶׁאֲנִי מְסַיֶּמֶת שׁוּרָה, נִצּוֹץ יָרֵחַ נִדְלָק בַּמַּפָּה." },
+      { title: "שער הסוד", text: "לוּנָה לוֹחֶשֶׁת: קְרִיאָה הִיא מַפְתֵּחַ קָטָן שֶׁפּוֹתֵחַ עוֹלָם גָּדוֹל." },
+      { title: "שער התיבה", text: "וּבַסּוֹף הַמַּסָּע אֲנִי פּוֹתַחַת תֵּבָה וּמוֹצֵאת קֶסֶם שֶׁשַּׁיָּךְ רַק לִי." }
     ];
 
     const cardDeck = [
       { icon: "✦", title: "ניצוץ ראשון", text: "נפתח אחרי שער אחד. הוכחה קטנה שהמסע התחיל." },
       { icon: "☾", title: "מפתח ירח", text: "נפתח אחרי שתי תחנות. מתאים לפתיחת חדר סודי במפה." },
-      { icon: "✧", title: "קלף אומץ", text: "נפתח אחרי שלוש תחנות. לומי אומרת: גם מילה קשה נכנעת לאט." },
-      { icon: "❖", title: "גביש סיפור", text: "נפתח אחרי ארבע תחנות. אפשר לבקש מרוני לבחור מילה אהובה." },
+      { icon: "✧", title: "קלף אומץ", text: "נפתח אחרי שלוש תחנות. לונה אומרת: גם מילה קשה נכנעת לאט." },
+      { icon: "❖", title: "גביש סיפור", text: "נפתח אחרי ארבע תחנות. אפשר לבקש מהקוראת לבחור מילה אהובה." },
       { icon: "✺", title: "פנס כוכבים", text: "נפתח אחרי חמש תחנות. מאיר את התחנה האחרונה." },
       { icon: "♛", title: "כתר קוראת", text: "נפתח בסיום כל המסע. רגע חגיגה קטן." }
     ];
 
-    const storageKey = "roniMoonReader.v20";
+    const storageKey = "moonReader.v20";
     const state = {
       pages: [],
-      encryptedPages: null,
       current: 0,
       word: 0,
       done: new Set(),
@@ -1136,6 +1312,7 @@
       missionTitle: document.getElementById("missionTitle"),
       missionText: document.getElementById("missionText"),
       companionSpeech: document.getElementById("companionSpeech"),
+      lunaImage: document.getElementById("lunaImage"),
       progressLabel: document.getElementById("progressLabel"),
       percentLabel: document.getElementById("percentLabel"),
       meterFill: document.getElementById("meterFill"),
@@ -1159,13 +1336,25 @@
       resetProgress: document.getElementById("resetProgress"),
       resetAll: document.getElementById("resetAll"),
       toast: document.getElementById("toast"),
-      celebration: document.getElementById("celebration"),
-      appShell: document.getElementById("appShell"),
-      unlockScreen: document.getElementById("unlockScreen"),
-      unlockForm: document.getElementById("unlockForm"),
-      bookPassword: document.getElementById("bookPassword"),
-      unlockError: document.getElementById("unlockError")
+      celebration: document.getElementById("celebration")
     };
+
+    const lunaExpressions = {
+      welcome: "assets/luna-welcome.png",
+      reading: "assets/luna-curious.png",
+      happy: "assets/luna-happy.png",
+      proud: "assets/luna-proud.png"
+    };
+
+    function setLunaMood(mood) {
+      const fallback = "assets/moon-companion-v2.png";
+      els.lunaImage.src = lunaExpressions[mood] || fallback;
+      els.lunaImage.onerror = () => {
+        els.lunaImage.onerror = null;
+        els.lunaImage.src = fallback;
+      };
+      els.lunaImage.classList.toggle("celebrating", mood === "happy" || mood === "proud");
+    }
 
     function normalizePages(raw) {
       return raw
@@ -1188,54 +1377,23 @@
 
     function load() {
       const saved = localStorage.getItem(storageKey);
-      if (!saved) return;
+      if (!saved) {
+        state.pages = demoPages;
+        return;
+      }
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed.pages) && parsed.pages.length) state.pages = parsed.pages;
+        state.pages = Array.isArray(parsed.pages) && parsed.pages.length ? parsed.pages : demoPages;
         state.current = Math.min(parsed.current || 0, state.pages.length - 1);
         state.done = new Set(Array.isArray(parsed.done) ? parsed.done : []);
       } catch {
-        state.current = 0;
-        state.done = new Set();
+        state.pages = demoPages;
       }
-    }
-
-    function fromBase64(value) {
-      const binary = atob(value);
-      const bytes = new Uint8Array(binary.length);
-      for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
-      return bytes;
-    }
-
-    async function decryptBook(password) {
-      const encoder = new TextEncoder();
-      const passwordKey = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveKey"]);
-      const key = await crypto.subtle.deriveKey({ name: "PBKDF2", salt: fromBase64(encryptedBook.salt), iterations: encryptedBook.iterations, hash: "SHA-256" }, passwordKey, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
-      const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv: fromBase64(encryptedBook.iv) }, key, fromBase64(encryptedBook.ciphertext));
-      const parsed = JSON.parse(new TextDecoder().decode(decrypted));
-      if (!Array.isArray(parsed.pages) || !parsed.pages.length) throw new Error("Missing pages");
-      return parsed.pages;
-    }
-
-    async function unlock(password) {
-      els.unlockError.textContent = "פותח...";
-      const pages = await decryptBook(password);
-      state.pages = pages;
-      state.encryptedPages = pages;
-      state.current = 0;
-      state.word = 0;
-      state.done = new Set();
-      load();
-      els.unlockScreen.hidden = true;
-      els.appShell.classList.remove("is-locked");
-      els.appShell.removeAttribute("aria-hidden");
-      els.bookPassword.value = "";
-      render();
     }
 
     function save() {
       localStorage.setItem(storageKey, JSON.stringify({
-        pages: state.pages === state.encryptedPages ? undefined : state.pages,
+        pages: state.pages,
         current: state.current,
         done: Array.from(state.done)
       }));
@@ -1267,6 +1425,7 @@
         stop.classList.toggle("done", isDone);
         stop.classList.toggle("current", isCurrent);
         stop.classList.toggle("locked", locked);
+        stop.classList.toggle("just-opened", isDone && index === state.current);
         stop.innerHTML = `<span>${isDone ? "✓" : index + 1}</span>`;
         stop.setAttribute("aria-label", `${state.pages[index]?.title || "תחנה"} ${locked ? "נעולה" : ""}`);
         stop.addEventListener("click", () => {
@@ -1337,7 +1496,7 @@
       const percent = total ? Math.round((done / total) * 100) : 0;
       const rewardOpen = done >= Math.min(3, total);
       els.doneStat.textContent = `${done}/${total}`;
-      els.starStat.textContent = `${done * 7}`;
+      els.starStat.textContent = `${Math.min(done, cardDeck.length)}/${cardDeck.length}`;
       els.rewardStat.textContent = rewardOpen ? "פתוחה" : "נעולה";
       els.progressLabel.textContent = `${done} מתוך ${total} תחנות`;
       els.percentLabel.textContent = `${percent}%`;
@@ -1347,10 +1506,13 @@
         ? "עכשיו ההורים יכולים לתת פרס קטן: ממתק קטן, משחק קצר, או בחירת סיפור."
         : "עוד קצת קריאה, והתיבה תהפוך לחלק מהקסם של המסע.";
       els.companionSpeech.textContent = done === total
-        ? "רוני, סיימת את כל השביל! אני שומרת לך כתר קוראת נוצץ."
+        ? "סיימת את כל השביל! אני שומרת לך כתר קוראת נוצץ."
         : done >= 3
           ? "התיבה פתוחה! עכשיו נמשיך לעוד שער אחד, בלי למהר."
-          : "היי רוני, אני לומי. היום אנחנו צריכות רק שער אחד. קטן, נוצץ, ואפשרי.";
+          : state.done.has(state.current)
+            ? "השער הזה כבר פתוח. אפשר לבחור שער חדש או לקרוא אותו שוב בכיף."
+            : "היי לך, אני לונה. היום אנחנו צריכות רק שער אחד. קטן, נוצץ, ואפשרי.";
+      setLunaMood(done === total ? "proud" : rewardOpen ? "happy" : state.done.has(state.current) ? "happy" : "welcome");
       els.missionTitle.textContent = done === total ? "המסע הושלם: כתר קוראת מחכה" : "המשימה של היום: לפתוח שער ירח אחד";
     }
 
@@ -1379,8 +1541,9 @@
       const colors = ["#ffc845", "#0fa6a0", "#f26f72", "#6d5bd0", "#ffffff"];
       for (let i = 0; i < 54; i += 1) {
         const spark = document.createElement("span");
-        spark.className = "spark";
+        spark.className = `spark ${i % 7 === 0 ? "moonlet" : i % 3 === 0 ? "star" : ""}`;
         spark.style.background = colors[i % colors.length];
+        if (spark.classList.contains("moonlet")) spark.style.background = "#fff2a8";
         spark.style.right = `${30 + Math.random() * 42}%`;
         spark.style.bottom = `${19 + Math.random() * 20}%`;
         spark.style.setProperty("--x", `${Math.random() * 620 - 310}px`);
@@ -1389,6 +1552,18 @@
         els.celebration.appendChild(spark);
         window.setTimeout(() => spark.remove(), 1120);
       }
+      for (let i = 0; i < 3; i += 1) {
+        const moon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        moon.setAttribute("viewBox", "0 0 64 64");
+        moon.classList.add("moon-burst");
+        moon.style.right = `${38 + i * 9}%`;
+        moon.style.bottom = `${24 + Math.random() * 8}%`;
+        moon.style.animationDelay = `${i * 90}ms`;
+        moon.innerHTML = '<path fill="currentColor" d="M42 56C27 56 15 44 15 29c0-9 4-17 11-22-1 3-2 6-2 10 0 15 12 27 27 27 2 0 5 0 7-1-5 8-9 13-16 13Z"/><path fill="rgba(255,255,255,.88)" d="M42 16l3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7Z"/>';
+        els.celebration.appendChild(moon);
+        window.setTimeout(() => moon.remove(), 1400);
+      }
+      setLunaMood(finale ? "proud" : "happy");
       toast(finale ? "כל שביל הירח נפתח!" : "שער חדש נפתח במפה!");
     }
 
@@ -1403,6 +1578,7 @@
       const last = Math.max(0, wordsFor(state.pages[state.current]).length - 1);
       state.word = Math.max(0, Math.min(last, state.word + delta));
       renderText();
+      setLunaMood("reading");
     }
 
     document.querySelectorAll(".tab").forEach(tab => {
@@ -1470,7 +1646,7 @@
 
     els.resetAll.addEventListener("click", () => {
       localStorage.removeItem(storageKey);
-      state.pages = state.encryptedPages || demoPages;
+      state.pages = demoPages;
       state.current = 0;
       state.word = 0;
       state.done = new Set();
@@ -1488,22 +1664,8 @@
       }
     });
 
-    els.unlockForm.addEventListener("submit", async event => {
-      event.preventDefault();
-      try {
-        await unlock(els.bookPassword.value);
-      } catch {
-        els.unlockError.textContent = "הסיסמה לא נכונה";
-        els.bookPassword.select();
-      }
-    });
-
-    if (!window.crypto || !window.crypto.subtle) {
-      els.unlockError.textContent = "צריך דפדפן מודרני כדי לפתוח את הספר";
-      els.bookPassword.disabled = true;
-    } else {
-      els.bookPassword.focus();
-    }
+    load();
+    render();
   </script>
 </body>
 </html>

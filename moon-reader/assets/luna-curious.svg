@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="לונה סקרנית">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="34%" r="62%">
+      <stop offset="0" stop-color="#f8ffdc"/>
+      <stop offset="1" stop-color="#b8f0ea"/>
+    </radialGradient>
+    <linearGradient id="hair" x1="44" x2="194" y1="34" y2="212">
+      <stop offset="0" stop-color="#19245a"/>
+      <stop offset="1" stop-color="#5c55bd"/>
+    </linearGradient>
+  </defs>
+  <circle cx="120" cy="120" r="112" fill="url(#bg)"/>
+  <path d="M41 138c0-61 35-100 79-100 50 0 80 40 80 97 0 51-34 79-80 79-49 0-79-27-79-76Z" fill="url(#hair)"/>
+  <path d="M171 52c-25 9-38 31-33 59-19-26-15-58 10-77-4 22 5 36 23 18Z" fill="#fff2a8"/>
+  <circle cx="120" cy="122" r="52" fill="#ffe0c4"/>
+  <path d="M80 110c-11-28 8-54 39-54 35 0 57 28 42 58-28-14-56-15-81-4Z" fill="#222b68"/>
+  <circle cx="100" cy="126" r="7" fill="#33213e"/>
+  <circle cx="142" cy="122" r="5" fill="#33213e"/>
+  <path d="M111 151c9 5 19 5 29 0" fill="none" stroke="#b24f65" stroke-width="6" stroke-linecap="round"/>
+  <path d="M63 216c11-38 35-60 57-60 25 0 48 21 59 60H63Z" fill="#0fa6a0"/>
+  <path d="M75 177c18-9 35-8 49 3v39c-17-10-33-11-49-3v-39Z" fill="#fffdf6" stroke="#6d5bd0" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M93 185h18M88 197h24" stroke="#f26f72" stroke-width="4" stroke-linecap="round"/>
+</svg>
